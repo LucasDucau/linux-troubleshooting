@@ -158,6 +158,45 @@ rpm-yum:
   # Undoes a movement
 
 network:
+  ping -I ens33 server.com
+  # Pings to a specific network adapter
+  yum install nmap
+  nmap hostname.com
+  nmap -A hostname
+  # -A = Scan + traceroute
+  ncat = nc 
+  yum install nmap-ncat
+  nc server.com 25
+  # Sends an email MAIL FROM: user RCPT TO: user Subject: hola .
+  iptraf-ng
+  # Useful ip tools with UI
+  nmcli conn
+  # Shows network devices
+  vim ifcfg-eth1
+  # Change the DEVICE and NAME to the shown adapter's name
+  nmcli con reload
+  nmcli dev status
+  # The device should pickup the change and work properly
+
+network-manager:
+  # nmcli applies changes to /etc/sysconfig/network-scripts
+  # Persistent configs are stored in /etc/sysconfig/network-scripts/ifcfg-name
+  nmcli con add con-name eno1234 type ethernet ifname eno1234 ip4 192.168.0.109 gw4 192.168.1.1
+  # nmcli added a connection
+  nmcli con up eno1234
+  # Up
+  nmcli dev dis eno1234
+  # Down
+
+tcpdump:
+  # Command-line packets sniffer
+  tcpdump -i eth0
+  # -i interface -c 4 amount-of-packets
+  tcpdump -w 0001.pcap -i eth0 
+  # Dumps to file
+  tcpdump -r 0001.pcap 
+  # Read file
   
+
 
 
