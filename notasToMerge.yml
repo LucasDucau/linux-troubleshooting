@@ -1,0 +1,163 @@
+aide:
+  # Advanced Intrusion Detection Environment
+  # Uses predefined rules to check file and directory integrity
+  # Takes a snapshot of selected parts of the filesystem
+  aide --init
+  # Creates database
+  mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+  # Rename the db
+  aide --check
+  # Checks if there are any new files or changes
+  aide --update
+  # Applies the change to the db
+
+auditd:
+  # Logs are stored in /var/log/audit/audit.log
+  # It's installed by default
+  auditctl -w /etc/ -p w -k etc_content
+  # -w watch -p permissions w=write a=attributes -k keyword
+  # Edit /etc/audit/rules.d/audit.rules
+  # Add rules as follows:
+  -w /etc -p w -k name
+  ausearch -i -k etc_content
+  # See changes with this command
+  auditctl -D 
+  # Removes all rules, to make it permanent delete audit.rules
+
+hardware:
+  lscpu = cat /proc/cpuinfo
+  # Shows details about the cpu
+  cat /proc/meminfo
+  # Shows details about memory
+  dmidecode [-t memory]
+  # Shows more info
+  lsscsi -v
+  # Shows scsi info
+  hdparm -I /dev/sda
+  # Shows details about a particular disk
+  lspci
+  # Details about pci
+  lsusb
+  # Details about usb, installs with usbutils
+  mcelog
+  # Logs and accounts machine checks on x86 systems
+  # Logs errors to /var/log/mcelog or syslog or the journal
+  systemctl status/start/enable mcelog
+  # Makes mcelog permanently enabled
+  journalctl -u mcelog.service
+  # Verify it's enabled
+  tail -f /var/log/mcelog | grep "hardware error"
+  # View error logs
+  rasdaemon
+  # Newer version of mcelog
+  systemctl status/start/enable rasdaemon
+  ras-mc-ctl --status
+  # Check status
+  # Will show drivers not loaded for VMs
+  ras-mc-ctl --errors
+  # Shows errors
+  yum install memtest86+
+  memtest-setup
+  grub2-mkconfig -o /boot/grub2/grub.cfg
+  # This command is needed for memtest to work
+  # A reboot is also needed
+  # Creates a new boot option
+  # Select it and press F1, it will perform extensive memory tests and show errors
+  
+kernel:
+  lsmod
+  # Shows the currently loaded modules
+  # Modules are stored in /sys/module
+  modinfo st
+  # Gives details about a module
+  modprobe st
+  # Loads the st module
+  modprobe -r modulename
+  # Unloads the module
+  modprobe -v st buffer_kbs=64
+  # Loads the st module with a modified parameter
+  # cd /etc/modprobe.d/
+  # vi st.conf
+  options st buffer_kbs=64 max_sg_segs=512
+  # Next time the module is loaded, it will have the updated parameters
+
+storage:
+  pvcreate /dev/sdb1 /dev/sdb2
+  # Creates a physical volume
+  vgcreate /dev/vgtest /dev/sdb1 /dev/sdb2
+  # Creates a volume group
+  dmsetup ls
+  # Shows disk paths
+  vgs 
+  # Shows volume groups
+  lvcreate -L +20M -n lvol1 /dev/vgtest
+  # Logical volume has been created
+  # Using dmsetup ls will show it now
+  dmsetup table /dev/mapper/vgtest-lvol2
+  # Shows the mapping used by the volume group
+
+device-mapper-multipath:
+  yum install device-mapper-multipath
+  find / -name multipath.conf
+  cp -p ~/multipath.conf /etc
+  modprobe dm_multipath
+  systemctl status/start/enable multipathd
+
+filesystem-selection:
+  # ext2, ext3, ext4, xfs
+  # Try to recover from corruption on ext3, ext4 filesystem 
+  e2fsck -n /dev/sdb1
+  unmount /test
+  # The disk needs to be unmounted
+  df -h
+  # Shows info about disks
+  dumpe2fs /dev/sdb1 | grep 'Backup superblock'
+  # Shows locations of the backup superblock
+  e2fsck -n /dev/sdb1 -b 32768
+  # 32768 came from the previous command
+  dd if=/dev/zero of=/dev/sdb1 bs=1024 count=2
+  # This corrupts the drive, leaving it unmountable
+  xfs_repair -n /dev/sdb1
+
+LVM:
+  vgcfgrestore -f /etc/lvm/archive/vgtest_(1234) vgtest
+  # Restores LVM
+
+rpm-yum:
+  # /var/log/yum.log contains a history of installed and erased packages
+  yum deplist package = rpm -q --request package
+  # Shows dependency list for the selected package
+  # yum uses rpm
+  yum -y downgrade base-prereq
+  # Downgrading a package is useful is other package needs an earlier version of it
+  yum install yum-plugin-versionlock
+  yum versionlock list
+  # Lists locked packages
+  yum versionlock add vsftpd
+  # Locks the current version of this package
+  rpm -qa
+  # An error is returned
+  cd /var/lib/rpm 
+  cd tmp
+  mkdir rpmdbdir
+  cd rpmdbdir
+  tar cvjf rpmdb.tar.bz2 /var/lib/rpm
+  # Make a backup of the current /var/lib/rpm directory
+  /usr/lib/rpm/rpmdb_verify Packages
+  # Attemps to autofix 
+  # Backup Packages before running this command:
+  /usr/lib/rpm/rpmdb_load Packages
+  # Creates a new Packages file
+  # rpm needs to rebuild indexes
+  rpm -v --rebuilddb
+  ###
+  yum history list
+  yum history info 24
+  # Lists info about a particular movement
+  yum history undo/redo 24
+  # Undoes a movement
+
+network:
+  
+
+
