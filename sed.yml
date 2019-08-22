@@ -1,0 +1,37 @@
+sed:
+  # Usage 
+  sed 's/search-pattern/replacement-string/flags' filename.txt
+  sed 's/WIFE/sed/i' # i = case insensitive
+  # g = global, replaces all occurences
+  # 2,3,4 = number of the occurence to be replaced
+  # If the 2 flag is passed, only lines with 2 occurences will be modified
+  # Sed executes the command across all lines of the file
+  sed -i.bak 's/wife/sed/' file.txt
+  # This command modifies the file and creates a file.txt.bak with the old contents
+  sed 's/love/like/gw newfile.txt' file.txt
+  # Creates a new file with the new changes
+  cat file.txt | sed 's/love/like'
+  # Pipe usage
+  sed 's#love#like' file.txt
+  # Any character works as a delimiter
+  sed '/This/d' file.txt
+  # Deletes all the lines containing This
+  sed '/^#/d' file
+  # Deletes all the files that begin with # 
+  sed '/^$/d' file
+  # Deletes all blank lines as ^ = beggining $ = end
+  sed '/^#/d' ; /^$/d ; s/test/replacement/' file
+  # Performs multiple actions on a file
+  # cat script.sed
+  /^#/d
+  /^$/d
+  s/test/test1
+  sed -f script.sed file
+  # This performs 3 sed actions on file
+  sed '2 s/test/test1' file
+  # Performs actions only on the 2nd line of the file
+  sed '/Group/ s/test/test1' config
+  # Performs actions on lines that contain Group
+  sed '1,3 s/test/test1' file
+  # Performs actions on lines 1to3
+   
